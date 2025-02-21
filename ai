@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aiCompressGPT - Image Compressor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .banner-ad {
+            width: 100%;
+            text-align: center;
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            z-index: 1000;
+        }
+        .top-ad { top: 0; }
+        .bottom-ad { bottom: 0; }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+
+        .upload-box {
+            border: 2px dashed #007bff;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #eef4ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-box:hover { background-color: #dce6ff; transform: scale(1.05); }
+
+        .new-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .image-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .image-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 180px;
+        }
+        .image-box img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .image-box button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+        }
+        .download-btn {
+            background-color: green;
+            color: white;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .controls select, .controls input, .controls button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .loader {
+            display: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <div class="container" id="main-container">
+        <div class="upload-box" id="drop-area">
+            <p>Drop images here to start compressing</p>
+            <button class="select-btn">Select Images</button>
+            <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+        </div>
+    </div>
+    
+    <div class="new-page" id="new-page">
+        <button onclick="window.location.reload();">⬅ Back</button>
+        
+        <div class="controls">
+            <input type="text" id="search-level" placeholder="Search KB (e.g., 100)">
+            <select id="compress-level"></select>
+            <button id="compress-btn">Compress</button>
+            <button id="add-more-images">Add More Images</button>
+        </div>
+        <div class="loader" id="loader">3</div>
+        <div class="image-list" id="image-list"></div>
+    </div>
+    
+    
+
+    <script>
+        document.querySelector('.select-btn').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input').addEventListener('change', function(event) {
+            addImages(event.target.files);
+        });
+
+        document.getElementById('add-more-images').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
+
+        for (let i = 1; i <= 1000; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `${i} KB`;
+            document.getElementById('compress-level').appendChild(option);
+        }
+
+        function addImages(files) {
+            if (files.length > 0) {
+                document.getElementById('main-container').style.display = 'none';
+                document.getElementById('new-page').style.display = 'flex';
+                const imageList = document.getElementById('image-list');
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.classList.add('image-box');
+                        div.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">
+                                         <p>${file.name} - ${Math.round(file.size / 1024)} KB</p>
+                                         <button class='download-btn'>Download</button>
+                                         <button class='delete-btn'>Delete</button>`;
+                        imageList.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
